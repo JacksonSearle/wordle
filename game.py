@@ -1,4 +1,4 @@
-from utils import load, save
+from utils import load, save, get_feedback
 from bots.chump_bot import ChumpBot
 from bots.random_bot import RandomBot
 from bots.greedy_bot import GreedyBot
@@ -49,7 +49,7 @@ class Game():
         game_state = []
         for turn in range(6):
             guess = self.take_turn(game_state)
-            feedback = self.get_feedback(guess, answer)
+            feedback = get_feedback(guess, answer)
             game_state.append((guess, feedback))
             if guess == answer:
                 return game_state, True
@@ -99,23 +99,3 @@ class Game():
     
     def valid_feedback(self, feedback):
         return len(feedback) == 5 and all([letter in 'BGY' for letter in feedback])
-    
-    def get_feedback(self, guess, solution):
-        feedback = []
-        taken = []
-        for gv, sv in zip(guess, solution):
-            if gv is sv:
-                feedback.append("G")
-                taken.append("T")
-            else:
-                feedback.append("?")
-                taken.append("?")
-        for i in range(5):
-            for j in range(5):
-                if guess[i] is solution[j] and i != j and taken[j] != "T" and feedback[i] == "?":
-                    feedback[i] = "Y"
-                    taken[j] = "T"
-        for i in range(len(feedback)):
-            if feedback[i] == "?" or feedback[i] == "C":
-                feedback[i] = "B"
-        return feedback

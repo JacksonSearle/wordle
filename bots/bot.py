@@ -1,9 +1,11 @@
-from utils import load
+from utils import load, get_feedback
 
 
 class Bot():
     def __init__(self):
         self.load_guesses()
+        self.get_feedback = get_feedback
+        self.knowledge = {}
     
     def load_guesses(self):
         self.guesses = load('words/guesses.pkl')
