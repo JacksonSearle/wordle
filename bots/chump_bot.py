@@ -1,4 +1,4 @@
-class Bot():
+class ChumpBot():
     def __init__(self):
         self.load_guesses()
     
