@@ -1,8 +1,9 @@
 import pickle
 from bots.chump_bot import ChumpBot
+from bots.greedy_bot import GreedyBot
 
 def select_bot():
-    bots = [ChumpBot]
+    bots = [ChumpBot, GreedyBot]
 
     # Print out each class name
     print('Select a bot:')
