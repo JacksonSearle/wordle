@@ -1,3 +1,4 @@
+from game import Game
 from bots.chump_bot import ChumpBot
 
 def manually_use_bot():
@@ -11,6 +12,10 @@ def manually_use_bot():
     # Get user input
     selection = input()
     bot = bots[int(selection)]()
+
+    # Play the game
+    game = Game(bot)
+    game.manually_use_bot()
 
 
 if __name__ == '__main__':
