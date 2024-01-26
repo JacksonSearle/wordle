@@ -34,14 +34,14 @@ This project features three bots for Wordle. Run bots in inference mode for help
    Follow the prompt to select a bot to train.
 
 2. **Testing the Bots**
-   To test the bots, use 'test' mode.
+   Run `main.py` in 'test' mode to test the bots. 
    ```
    python main.py test
    ```
    Follow the prompt to select a bot to test.
 
 3. **Inference**
-   For running the bots in inference mode:
+   Run `main.py` in 'inference' mode for bot inference. 
    ```
    python main.py inference
    ```
