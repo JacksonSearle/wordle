@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from utils import load, save, get_feedback
 from bots.chump_bot import ChumpBot
 from bots.random_bot import RandomBot
@@ -67,7 +68,7 @@ class Game():
         return True
     
     def train(self):
-        for answer in self.answers:
+        for answer in tqdm(self.answers):
             game_state = []
             for turn in range(6):
                 guess = self.take_turn(game_state)

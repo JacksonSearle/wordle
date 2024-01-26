@@ -14,48 +14,52 @@ class GreedyBot(Bot):
             return self.calculate_guess()
         
     def get_knowledge(self, game_state):
+        if self.knowledge == {}:
+            return None
         temp = self.knowledge
         for guess, feedback in game_state:
-            if (guess, feedback) not in temp:
+            key = (tuple(guess), tuple(feedback))
+            if key not in temp:
                 return None
-            temp = temp[(guess, feedback)]
+            temp = temp[key]
         return temp
         
     def record(self, game_state):
         temp = self.knowledge
         for guess, feedback in game_state:
-            if (guess, feedback) not in temp:
-                temp[(guess, feedback)] = {}
-            temp = temp[(guess, feedback)]            
+            key = (tuple(guess), tuple(feedback))
+            if key not in temp:
+                temp[key] = {}
+            temp = temp[key]
 
     def calculate_guess(self):
-        cur_solutions = self.get_cur_solutions()
+        cur_answers = self.get_cur_answers()
         avg_guesses = []
         for guess in self.guesses:
-            num = self.avg_guess(guess, cur_solutions)
+            num = self.avg_guess(guess, cur_answers)
             avg_guesses.append(num)
-        for solution in cur_solutions:
-            index = self.guesses.index(solution)
-            avg_guesses[index] *= (len(cur_solutions) - 1) / len(cur_solutions)
+        for answer in cur_answers:
+            index = self.guesses.index(answer)
+            avg_guesses[index] *= (len(cur_answers) - 1) / len(cur_answers)
         best_word = self.guesses[avg_guesses.index(min(avg_guesses))]
         return best_word
     
-    def get_cur_solutions(self):
-        cur_solutions = []
-        for solution in self.solutions:
+    def get_cur_answers(self):
+        cur_answers = []
+        for answer in self.answers:
             for guess, feedback in self.game_state:
                 #TODO: make a quick_feedback function
-                if self.get_feedback(guess, solution) != feedback:
+                if self.get_feedback(guess, answer) != feedback:
                     break
-            cur_solutions.append(solution)
-        return cur_solutions
+            cur_answers.append(answer)
+        return cur_answers
 
-    def avg_guess(self, guess, curr_solutions):
+    def avg_guess(self, guess, cur_answers):
         num_left = []
         for _, feedback in self.game_state:
             count = 0
-            for solution in curr_solutions:
-                if self.get_feedback(guess, solution) == feedback:
+            for answer in cur_answers:
+                if self.get_feedback(guess, answer) == feedback:
                     count += 1
             num_left.append(count)
         avg = 0
