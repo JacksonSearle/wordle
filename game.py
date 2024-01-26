@@ -60,17 +60,20 @@ class Game():
         print(f'\nTesting {self.bot.__class__.__name__}...')
         total_turns = 0
         max_turns = 0
+        wins = 0
         for answer in self.answers:
             game_state, won = self.play(answer)
             turns_taken = len(game_state)
             total_turns += turns_taken
             max_turns = max(max_turns, turns_taken)
-            if not won:
-                print(f'Failed to win with answer: {answer}')
+            if won:
+                wins += 1
         num_answers = len(self.answers)
-        average_turns = total_turns / num_answers
+        average_turns = round(total_turns / num_answers, 2)
+        win_percentage = round((wins / num_answers) * 100, 2)
         print(f'Average turns needed to win: {average_turns}')
-        print(f'Most amount of turns taken: {max_turns}')
+        print(f'Highest number of turns taken: {max_turns}')
+        print(f'Win percentage: {win_percentage}%')
     
     def train(self):
         for answer in tqdm(self.answers):

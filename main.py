@@ -3,7 +3,7 @@ from game import Game
 
 
 def main():
-    # Train, test, or inference
+    # Set mode to train, test, or inference
     Game(mode='test')
 
 if __name__ == '__main__':
