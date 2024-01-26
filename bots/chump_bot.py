@@ -1,6 +1,7 @@
-class ChumpBot():
+from bots.bot import Bot
+class ChumpBot(Bot):
     def __init__(self):
-        self.load_guesses()
+        super().__init__()
     
     def load_guesses(self):
         pass
