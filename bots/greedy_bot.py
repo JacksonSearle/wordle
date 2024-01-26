@@ -14,14 +14,16 @@ class GreedyBot(Bot):
             return self.calculate_guess()
         
     def get_knowledge(self, game_state):
-        if self.knowledge == {}:
-            return None
         temp = self.knowledge
+        if temp == {}:
+            return None
         for guess, feedback in game_state:
             key = (tuple(guess), tuple(feedback))
             if key not in temp:
                 return None
             temp = temp[key]
+            if temp == {}:
+                return None
         return temp
         
     def record(self, game_state):
