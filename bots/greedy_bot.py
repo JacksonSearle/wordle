@@ -56,14 +56,17 @@ class GreedyBot(Bot):
             cur_answers.append(answer)
         return cur_answers
 
+    #! This function doesn't work. The original uses feedbacks.pkl
+    # feedbacks.pkl is a list of every possible feedback period
+    # I think it averaged across all the feedbacks, which would be wrong
+    # I think it should average across the number of possible answers
     def avg_guess(self, guess, cur_answers):
-        num_left = []
-        for _, feedback in self.game_state:
+        counter = {}
+        for answer in cur_answers:
             count = 0
-            for answer in cur_answers:
-                if self.get_feedback(guess, answer) == feedback:
-                    count += 1
-            num_left.append(count)
+            if self.get_feedback(guess, answer) == feedback:
+                count += 1
+        num_left.append(count)
         avg = 0
         summation = sum(num_left)
         for num in num_left:
