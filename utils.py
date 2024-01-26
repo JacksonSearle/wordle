@@ -1,3 +1,4 @@
+import pickle
 from bots.chump_bot import ChumpBot
 
 def select_bot():
@@ -13,3 +14,11 @@ def select_bot():
     bot = bots[int(selection)]()
     
     return bot
+
+def save(bot, name):
+    # Pickle this object to bots/saved/chump_bot.pkl
+    pickle.dump(bot, open(f'bots/saved/{name}.pkl', 'wb'))
+
+def load(name):
+    # Load the pickled object from bots/saved/chump_bot.pkl
+    return pickle.load(open(f'bots/saved/{name}.pkl', 'rb'))
