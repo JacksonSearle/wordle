@@ -1,7 +1,9 @@
+from utils import select_bot
 from game import Game
 
 def main():
-    game = Game()
+    bot = select_bot()
+    game = Game(bot)
     if game.test():
         print('All tests passed!')
     else:

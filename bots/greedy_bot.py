@@ -1,7 +1,7 @@
 from bots.bot import Bot
 
 
-class ChumpBot(Bot):
+class GreedyBot(Bot):
     def __init__(self):
         self.load_guesses()
     
@@ -9,7 +9,7 @@ class ChumpBot(Bot):
         pass
 
     def guess(self, game_state):
-        return 'chump'
+        return 'chimp'
     
     def record(self, game_state):
         pass
