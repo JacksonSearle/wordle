@@ -22,10 +22,10 @@ def select_bot():
     
     return bot
 
-def save(bot, name):
-    # Pickle this object to bots/saved/chump_bot.pkl
-    pickle.dump(bot, open(f'bots/saved/{name}.pkl', 'wb'))
+def save(object, path):
+    # Pickle this object
+    pickle.dump(object, open(path, 'wb'))
 
-def load(name):
-    # Load the pickled object from bots/saved/chump_bot.pkl
-    return pickle.load(open(f'bots/saved/{name}.pkl', 'rb'))
+def load(path):
+    # Load the pickled object
+    return pickle.load(open(path, 'rb'))

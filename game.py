@@ -6,11 +6,11 @@ class Game():
         if train:
             self.bot = Bot
         else:
-            self.bot = load(Bot.__class__.__name__)
+            self.bot = load(f'bots/saved/{Bot.__class__.__name__}.pkl')
         self.load_answers()
 
     def load_answers(self):
-        self.answers = ['chimp']
+        self.answers = load('words/answers.pkl')
 
     def play(self, answer):
         game_state = []

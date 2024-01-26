@@ -7,7 +7,7 @@ def train():
     bot = select_bot()
     game = Game(bot, train=True)
     game.train()
-    save(bot, bot.__class__.__name__)
+    save(bot, f'bots/saved/{bot.__class__.__name__}.pkl')
 
 if __name__ == '__main__':
     train()
