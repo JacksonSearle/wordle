@@ -1,16 +1,48 @@
-from utils import load
+from utils import load, save
+from bots.chump_bot import ChumpBot
+from bots.greedy_bot import GreedyBot
 
 
 class Game():
-    def __init__(self, Bot, train=False):
-        if train:
-            self.bot = Bot
-        else:
-            self.bot = load(Bot.__class__.__name__)
+    def __init__(self,mode='inference'):
         self.load_answers()
+        Bot = self.select_bot()
+        if mode == 'train':
+            self.bot = Bot
+            self.train()
+            save(self.bot, f'bots/saved/{self.bot.__class__.__name__}.pkl')
+        else:
+            self.bot = load(f'bots/saved/{Bot.__class__.__name__}.pkl')
+            if mode == 'test':
+                if self.test():
+                    print('Tests passed!')
+                else:
+                    print('Tests failed!')
+            elif mode == 'inference':
+                self.inference()
+
+    def select_bot(self):
+        bots = [ChumpBot, GreedyBot]
+
+        # Print out each class name
+        print('Select a bot:')
+        for i, bot in enumerate(bots):
+            print(f'{i}: {bot.__name__}')
+
+        # Get user input
+        while True:
+            selection = input()
+            if selection.isdigit() and int(selection) in range(len(bots)):
+                break
+            else:
+                print('Invalid selection. Please try again.')
+
+        bot = bots[int(selection)]()
+        
+        return bot
 
     def load_answers(self):
-        self.answers = ['chimp']
+        self.answers = load('words/answers.pkl')
 
     def play(self, answer):
         game_state = []
@@ -26,6 +58,7 @@ class Game():
         return self.bot.guess(game_state)
     
     def test(self):
+        print(f'\nTesting {self.bot.__class__.__name__}...')
         for answer in self.answers:
             _, won = self.play(answer)
             if not won:
@@ -37,7 +70,7 @@ class Game():
             game_state, won = self.play(answer)
             self.bot.record(game_state)
     
-    def manually_use_bot(self):
+    def inference(self):
         # Play the game
         print('\n\n\n\n\n')
         print('Welcome to Wordle!')
