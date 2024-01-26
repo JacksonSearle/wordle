@@ -1,11 +1,12 @@
-# Make me a Bot class that implements all the methods of the ChumpBot class.
+from utils import load
+
 
 class Bot():
     def __init__(self):
-        pass
+        self.load_guesses()
     
     def load_guesses(self):
-        pass
+        self.guesses = load('words/guesses.pkl')
 
     def guess(self, game_state):
         pass
