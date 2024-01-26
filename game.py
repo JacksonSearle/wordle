@@ -68,8 +68,12 @@ class Game():
     
     def train(self):
         for answer in self.answers:
-            game_state, won = self.play(answer)
-            self.bot.record(game_state)
+            game_state = []
+            for turn in range(6):
+                guess = self.take_turn(game_state)
+                feedback = get_feedback(guess, answer)
+                game_state.append((guess, feedback))
+                self.bot.record(game_state)
     
     def inference(self):
         # Play the game

@@ -7,16 +7,26 @@ class GreedyBot(Bot):
 
     def guess(self, game_state):
         self.game_state = game_state
-        if self.in_knowledge(game_state):
-            return self.get_knowledge(game_state)
+        guess = self.get_knowledge(game_state)
+        if guess is not None:
+            return guess
         else:
             return self.calculate_guess()
         
-    def in_knowledge(self, game_state):
-        
+    def get_knowledge(self, game_state):
+        temp = self.knowledge
+        for guess, feedback in game_state:
+            if (guess, feedback) not in temp:
+                return None
+            temp = temp[(guess, feedback)]
+        return temp
         
     def record(self, game_state):
-        pass
+        temp = self.knowledge
+        for guess, feedback in game_state:
+            if (guess, feedback) not in temp:
+                temp[(guess, feedback)] = {}
+            temp = temp[(guess, feedback)]            
 
     def calculate_guess(self):
         cur_solutions = self.get_cur_solutions()
