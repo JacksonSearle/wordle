@@ -7,8 +7,14 @@ class GreedyBot(Bot):
 
     def guess(self, game_state):
         self.game_state = game_state
-        return 'chimp'
-    
+        if self.in_knowledge(game_state):
+            return self.get_knowledge(game_state)
+        else:
+            return self.calculate_guess()
+        
+    def in_knowledge(self, game_state):
+        
+        
     def record(self, game_state):
         pass
 
@@ -16,7 +22,7 @@ class GreedyBot(Bot):
         cur_solutions = self.get_cur_solutions()
         avg_guesses = []
         for guess in self.guesses:
-            num = self.avg_guess(guess)
+            num = self.avg_guess(guess, cur_solutions)
             avg_guesses.append(num)
         for solution in cur_solutions:
             index = self.guesses.index(solution)
@@ -24,18 +30,19 @@ class GreedyBot(Bot):
         best_word = self.guesses[avg_guesses.index(min(avg_guesses))]
         return best_word
     
-    def get_cur_solutions(self, guess):
+    def get_cur_solutions(self):
         cur_solutions = []
         for solution in self.solutions:
-            for _, feedback in self.game_state:
+            for guess, feedback in self.game_state:
                 #TODO: make a quick_feedback function
-                if self.get_feedback(guess, solution) == feedback:
-                    cur_solutions.append(solution)
+                if self.get_feedback(guess, solution) != feedback:
+                    break
+            cur_solutions.append(solution)
         return cur_solutions
 
-    def avg_guess(self, guess, curr_solutions, feedbacks):
+    def avg_guess(self, guess, curr_solutions):
         num_left = []
-        for feedback in feedbacks:
+        for _, feedback in self.game_state:
             count = 0
             for solution in curr_solutions:
                 if self.get_feedback(guess, solution) == feedback:
