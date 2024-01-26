@@ -1,5 +1,6 @@
 from utils import load, save
 from bots.chump_bot import ChumpBot
+from bots.random_bot import RandomBot
 from bots.greedy_bot import GreedyBot
 
 
@@ -22,7 +23,7 @@ class Game():
                 self.inference()
 
     def select_bot(self):
-        bots = [ChumpBot, GreedyBot]
+        bots = [ChumpBot, RandomBot, GreedyBot]
 
         # Print out each class name
         print('Select a bot:')
