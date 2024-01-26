@@ -1,4 +1,3 @@
-from tqdm import tqdm
 from bots.bot import Bot
 
 
