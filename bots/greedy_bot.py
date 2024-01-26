@@ -60,10 +60,6 @@ class GreedyBot(Bot):
                 cur_answers.append(answer)
         return cur_answers
 
-    #! This function doesn't work. The original uses feedbacks.pkl
-    # feedbacks.pkl is a list of every possible feedback period
-    # I think it averaged across all the feedbacks, which would be wrong
-    # I think it should average across the number of possible answers
     def avg_guess(self, guess, cur_answers):
         # Count the number of times each feedback occurs
         counter = {}
