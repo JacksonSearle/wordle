@@ -16,10 +16,7 @@ class Game():
         else:
             self.bot = load(f'bots/saved/{Bot.__class__.__name__}.pkl')
             if mode == 'test':
-                if self.test():
-                    print('Tests passed!')
-                else:
-                    print('Tests failed!')
+                self.test()
             elif mode == 'inference':
                 self.inference()
 
@@ -61,11 +58,19 @@ class Game():
     
     def test(self):
         print(f'\nTesting {self.bot.__class__.__name__}...')
+        total_turns = 0
+        max_turns = 0
         for answer in self.answers:
-            _, won = self.play(answer)
+            game_state, won = self.play(answer)
+            turns_taken = len(game_state)
+            total_turns += turns_taken
+            max_turns = max(max_turns, turns_taken)
             if not won:
-                return False
-        return True
+                print(f'Failed to win with answer: {answer}')
+        num_answers = len(self.answers)
+        average_turns = total_turns / num_answers
+        print(f'Average turns needed to win: {average_turns}')
+        print(f'Most amount of turns taken: {max_turns}')
     
     def train(self):
         for answer in tqdm(self.answers):
@@ -75,6 +80,8 @@ class Game():
                 feedback = get_feedback(guess, answer)
                 game_state.append((guess, feedback))
                 self.bot.record(game_state)
+                if guess == answer:
+                    break
     
     def inference(self):
         # Play the game

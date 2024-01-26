@@ -4,7 +4,7 @@ from game import Game
 
 def main():
     # Train, test, or inference
-    Game(mode='train')
+    Game(mode='test')
 
 if __name__ == '__main__':
     main()
