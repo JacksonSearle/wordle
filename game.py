@@ -1,4 +1,4 @@
-from bot import Bot
+from bots.chump_bot import Bot
 
 class Game():
     def __init__(self):
