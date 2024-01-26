@@ -6,13 +6,9 @@ class Game():
         self.load_answers()
 
     def load_answers(self):
-        pass
+        self.answers = ['chimp']
 
-    def select_answer(self):
-        return 'chimp'
-
-    def play(self):
-        answer = self.select_answer()
+    def play(self, answer):
         game_state = []
         for turn in range(6):
             guess = self.take_turn(game_state)
@@ -23,3 +19,9 @@ class Game():
 
     def take_turn(self, game_state):
         return self.bot.guess(game_state)
+    
+    def test(self):
+        for answer in self.answers:
+            if self.play(answer) == False:
+                return False
+        return True
