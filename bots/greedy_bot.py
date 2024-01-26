@@ -1,3 +1,4 @@
+from utils import load
 from bots.bot import Bot
 
 
@@ -6,7 +7,7 @@ class GreedyBot(Bot):
         self.load_guesses()
     
     def load_guesses(self):
-        pass
+        self.guesses = load('words/guesses.pkl')
 
     def guess(self, game_state):
         return 'chimp'
