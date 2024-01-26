@@ -5,11 +5,9 @@ from game import Game
 def train():
     # Trains a bot of your choice
     bot = select_bot()
-    game = Game(bot)
+    game = Game(bot, train=True)
     game.train()
-    bot.save()
-
-
+    save(bot, bot.__class__.__name__)
 
 if __name__ == '__main__':
     train()

@@ -1,6 +1,12 @@
+from utils import load
+
+
 class Game():
-    def __init__(self, Bot):
-        self.bot = Bot
+    def __init__(self, Bot, train=False):
+        if train:
+            self.bot = Bot
+        else:
+            self.bot = load(Bot.__class__.__name__)
         self.load_answers()
 
     def load_answers(self):

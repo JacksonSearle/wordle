@@ -10,7 +10,13 @@ def select_bot():
         print(f'{i}: {bot.__name__}')
 
     # Get user input
-    selection = input()
+    while True:
+        selection = input()
+        if selection.isdigit() and int(selection) in range(len(bots)):
+            break
+        else:
+            print('Invalid selection. Please try again.')
+
     bot = bots[int(selection)]()
     
     return bot
