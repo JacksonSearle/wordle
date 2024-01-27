@@ -1,7 +1,8 @@
 from bots.bot import Bot
-
+num_nodes = 0
 class Node():
     def __init__(self, name, info, states=None, parent=None):
+        num_nodes += 1
         self.name = name
         self.info = info
         self.parents = []
