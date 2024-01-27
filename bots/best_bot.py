@@ -10,7 +10,7 @@ class Node():
         if parent != None:
             self.add_parent(parent)
         if states != None:
-            states.append(self)
+            states[self.info] = self
     
     def add_parent(self, parent):
         self.parents.append(parent)
@@ -23,7 +23,7 @@ class Node():
 class BestBot(Bot):
     def __init__(self):
         super().__init__()
-        self.states = []
+        self.states = {}
         self.root = Node('state', self.answers, self.states)
 
     def guess(self, game_info):
@@ -36,9 +36,9 @@ class BestBot(Bot):
     def get_knowledge(self, game_info):
         temp_game_info = game_info.copy()
         while len(temp_game_info) >= 0:
-            for state in self.states:
-                if state.info  == self.get_cur_state(temp_game_info):
-                    return state
+            state = self.get_cur_state(temp_game_info)
+            if state in self.states:
+                return state
             temp_game_info.pop()
         return None
     
@@ -78,12 +78,10 @@ class BestBot(Bot):
             cur_state = self.update_state(feedback_node)
             # Check if state_node is already in self.states
             found = False
-            for state in self.states:
-                if state.info == cur_state:
-                    found = True
-                    feedback_node.add_child(state)
-                    break
-            if not found:
+            if cur_state in self.states:
+                state = self.states[cur_state]
+                feedback_node.add_child(state)
+            else:
                 Node('state', cur_state, self.states, parent=feedback_node)
 
     def update_state(self, feedback_node):
@@ -110,6 +108,7 @@ class BestBot(Bot):
             if self.get_feedback(guess, answer) == feedback:
                 new_state.append(answer)
 
+        # TODO: Recurse???
         return new_state
 
     def get_cur_state(self):
