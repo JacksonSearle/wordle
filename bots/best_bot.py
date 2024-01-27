@@ -6,6 +6,7 @@ class Node():
         self.info = info
         self.parents = []
         self.children = []
+        self.guess = None
         if parent != None:
             self.add_parent(parent)
         if states != None:
@@ -26,11 +27,11 @@ class BestBot(Bot):
         self.root = Node('state', self.answers, self.states)
 
     def guess(self, game_info):
-        guess = self.get_knowledge(game_info)
-        if guess:
-            return guess
+        state = self.get_knowledge(game_info)
+        if state.guess:
+            return state.guess
         else:
-            return self.calculate_guess()
+            return self.calculate_guess(state)
     
     def get_knowledge(self, game_info):
         temp_game_info = game_info.copy()
@@ -42,7 +43,7 @@ class BestBot(Bot):
         return None
     
     def record(self, game_info):
-        # This is done automatically in the calculate_guess function
+        # Add game_info to knowledge like how greedy_bot does it
         pass
 
     def calculate_guess(self, root):
@@ -74,19 +75,16 @@ class BestBot(Bot):
         # There are not duplicates of state_nodes, unique ones are shared between feedback nodes
         # Add all states to self.states
         for feedback_node in feedback_nodes:
-            state = self.update_state(feedback_node)
-            state_node = Node('state', state, parent=feedback_node)
+            cur_state = self.update_state(feedback_node)
             # Check if state_node is already in self.states
             found = False
             for state in self.states:
-                if state.info == state_node.info:
+                if state.info == cur_state:
                     found = True
-                    # Attach the feedback_node to the state_node
                     feedback_node.add_child(state)
                     break
             if not found:
-                self.states.append(state_node)
-        pass
+                Node('state', cur_state, self.states, parent=feedback_node)
 
     def update_state(self, feedback_node):
         # Given a feedback node, update the state of the game
