@@ -9,22 +9,29 @@ from bots.best_bot import BestBot
 class Game():
     def __init__(self,mode='inference', subset=None):
         self.subset = subset
+        if mode == 'subset':
+            self.create_subset()
+            return
         self.load_answers()
         Bot = self.select_bot()
-        if mode == 'subset':
-            self.subset()
-        elif mode == 'train':
-            self.bot = Bot(self.subset)
+        if mode == 'train':
+            self.bot = Bot
             self.train()
-            save(self.bot, f'bots/saved/{self.bot.__class__.__name__}{subset}.pkl')
+            if subset:
+                save(self.bot, f'bots/saved/{self.bot.__class__.__name__}{subset}.pkl')
+            else:
+                save(self.bot, f'bots/saved/{self.bot.__class__.__name__}.pkl')
         else:
-            self.bot = load(f'bots/saved/{Bot.__class__.__name__}{subset}.pkl')
+            if subset:
+                self.bot = load(f'bots/saved/{Bot.__class__.__name__}{subset}.pkl')
+            else:
+                self.bot = load(f'bots/saved/{Bot.__class__.__name__}.pkl')
             if mode == 'test':
                 self.test()
             elif mode == 'inference':
                 self.inference()
 
-    def subset(self):
+    def create_subset(self):
         # Load answers.pkl and guesses.pkl and save a subset of them
         answers = load('words/answers.pkl')
         guesses = load('words/guesses.pkl')
@@ -33,8 +40,8 @@ class Game():
         num_answers = len(answers)
         num_guesses = len(guesses)
 
-        subset_answers = answers[:int(num_answers * self.subset)]
-        subset_guesses = guesses[:int(num_guesses * self.subset)]
+        subset_answers = answers[:int(num_answers * float(self.subset))]
+        subset_guesses = guesses[:int(num_guesses * float(self.subset))]
 
         # Save the subsets
         save(subset_answers, f'words/answers{self.subset}.pkl')
@@ -56,12 +63,15 @@ class Game():
             else:
                 print('Invalid selection. Please try again.')
 
-        bot = bots[int(selection)]()
+        bot = bots[int(selection)](self.subset)
         
         return bot
 
     def load_answers(self):
-        self.answers = load(f'words/answers{self.subset}.pkl')
+        if self.subset:
+            self.answers = load(f'words/answers{self.subset}.pkl')
+        else:
+            self.answers = load('words/answers.pkl')
 
     def play(self, answer):
         game_state = []
