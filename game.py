@@ -7,19 +7,38 @@ from bots.best_bot import BestBot
 
 
 class Game():
-    def __init__(self,mode='inference'):
+    def __init__(self,mode='inference', subset=None):
+        self.subset = subset
         self.load_answers()
         Bot = self.select_bot()
-        if mode == 'train':
-            self.bot = Bot
+        if mode == 'subset':
+            self.subset()
+        elif mode == 'train':
+            self.bot = Bot(self.subset)
             self.train()
-            save(self.bot, f'bots/saved/{self.bot.__class__.__name__}.pkl')
+            save(self.bot, f'bots/saved/{self.bot.__class__.__name__}{subset}.pkl')
         else:
-            self.bot = load(f'bots/saved/{Bot.__class__.__name__}.pkl')
+            self.bot = load(f'bots/saved/{Bot.__class__.__name__}{subset}.pkl')
             if mode == 'test':
                 self.test()
             elif mode == 'inference':
                 self.inference()
+
+    def subset(self):
+        # Load answers.pkl and guesses.pkl and save a subset of them
+        answers = load('words/answers.pkl')
+        guesses = load('words/guesses.pkl')
+
+        # Randomly select self.subset percent of the data
+        num_answers = len(answers)
+        num_guesses = len(guesses)
+
+        subset_answers = answers[:int(num_answers * self.subset)]
+        subset_guesses = guesses[:int(num_guesses * self.subset)]
+
+        # Save the subsets
+        save(subset_answers, f'words/answers{self.subset}.pkl')
+        save(subset_guesses, f'words/guesses{self.subset}.pkl')
 
     def select_bot(self):
         bots = [ChumpBot, RandomBot, GreedyBot, BestBot]
@@ -42,7 +61,7 @@ class Game():
         return bot
 
     def load_answers(self):
-        self.answers = load('words/answers.pkl')
+        self.answers = load(f'words/answers{self.subset}.pkl')
 
     def play(self, answer):
         game_state = []

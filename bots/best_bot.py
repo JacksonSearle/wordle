@@ -22,8 +22,8 @@ class Node():
         child.parents.append(self)
 
 class BestBot(Bot):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, subset):
+        super().__init__(subset)
         self.states = {}
         self.root = Node('state', self.answers, self.states)
 

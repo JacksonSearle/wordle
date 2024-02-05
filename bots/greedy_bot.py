@@ -2,8 +2,8 @@ from bots.bot import Bot
 
 
 class GreedyBot(Bot):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, subset):
+        super().__init__(subset)
 
     def guess(self, game_state):
         self.game_state = game_state
