@@ -1,18 +1,30 @@
 from bots.bot import Bot
 num_nodes = 0
 class Node():
-    def __init__(self, name, info, states=None, parent=None):
+    def __init__(self, name, info, states=None, parent=None, turn=None):
         self.name = name
         self.info = info
         self.parents = []
         self.children = []
         self.guess = None
-        if parent != None:
-            self.add_parent(parent)
+
         if states != None:
             if type(self.info) == list:
                 self.info = tuple(self.info)
             states[self.info] = self
+
+        if turn:
+            self.turn = turn
+        else:
+            self.turn = parent.turn
+            if parent.name == 'feedback':
+                self.turn += 1
+
+        if turn > 6:
+            raise Exception('Turn is greater than 6')
+
+        if parent != None:
+            self.add_parent(parent)
     
     def add_parent(self, parent):
         self.parents.append(parent)
@@ -43,8 +55,11 @@ class BestBot(Bot):
     def get_knowledge(self, game_info):
         # Make a root node if it doesn't exist
         if not self.root:
-            self.root = Node('state', self.answers, self.states); self.num_nodes += 1
-            return self.root
+            try:
+                self.root = Node('state', self.answers, self.states, turn=0); self.num_nodes += 1
+                return self.root
+            except:
+                print('Error failed to make root node')
         temp_game_info = game_info.copy()
         while len(temp_game_info) >= 0:
             state = self.get_cur_state(temp_game_info)
@@ -97,17 +112,19 @@ class BestBot(Bot):
                 state = self.states[tuple(cur_state)]
                 feedback_node.add_child(state)
             else:
-                #TODO: Make sure the state being added has more information
                 #TODO: Am I adding this to the graph? Yes, I just don't recurse here I think
-                state = Node('state', cur_state, self.states, parent=feedback_node); self.num_nodes += 1
-                # If state has only one answer, then use that as the guess
-                if len(cur_state) == 1:
-                    state.guess = cur_state[0]
-                    #TODO: Uncomment the next line
-                    # return state
-                else:
-                    #TODO: Make the next line return
-                    self.guess_nodes(state)
+                try:
+                    state = Node('state', cur_state, self.states, parent=feedback_node); self.num_nodes += 1
+                    # If state has only one answer, then use that as the guess
+                    if len(cur_state) == 1:
+                        state.guess = cur_state[0]
+                        #TODO: Uncomment the next line
+                        # return state
+                    else:
+                        #TODO: Make the next line return
+                        self.guess_nodes(state)
+                except:
+                    continue
 
 
     def update_state(self, feedback_node):
