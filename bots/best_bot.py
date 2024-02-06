@@ -63,8 +63,8 @@ class BestBot(Bot):
         temp_game_info = game_info.copy()
         while len(temp_game_info) >= 0:
             state = self.get_cur_state(temp_game_info)
-            if tuple(state) in self.states:
-                return self.states[tuple(state)]
+            if state in self.states:
+                return self.states[state]
             temp_game_info.pop()
     
     def record(self, game_info):
@@ -105,11 +105,11 @@ class BestBot(Bot):
             # See if the state changed since the last time
             guess_node = feedback_node.parents[0]
             state_node = guess_node.parents[0]
-            if state_node.info == tuple(cur_state):
+            if state_node.info == cur_state:
                 # Don't add the state to the graph, since no information was gained
                 continue
-            if tuple(cur_state) in self.states:
-                state = self.states[tuple(cur_state)]
+            if cur_state in self.states:
+                state = self.states[cur_state]
                 feedback_node.add_child(state)
             else:
                 #TODO: Am I adding this to the graph? Yes, I just don't recurse here I think
@@ -151,8 +151,7 @@ class BestBot(Bot):
             if self.get_feedback(guess, answer) == feedback:
                 new_state.append(answer)
 
-        # TODO: Recurse???
-        return new_state
+        return tuple(new_state)
 
     def get_cur_state(self, game_info):
         cur_state = []
@@ -165,4 +164,4 @@ class BestBot(Bot):
                     break
             if success:
                 cur_state.append(answer)
-        return cur_state
+        return tuple(cur_state)
