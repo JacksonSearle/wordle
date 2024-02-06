@@ -7,21 +7,21 @@ class Node():
         self.parents = []
         self.children = []
         self.guess = None
+        self.turn = turn
 
         if states != None:
             if type(self.info) == list:
                 self.info = tuple(self.info)
             states[self.info] = self
 
-        if turn:
+        if turn != None:
             self.turn = turn
         else:
             self.turn = parent.turn
             if parent.name == 'feedback':
                 self.turn += 1
-
-        if turn > 6:
-            raise Exception('Turn is greater than 6')
+                if self.turn > 6:
+                    raise Exception('Turn is greater than 6')
 
         if parent != None:
             self.add_parent(parent)
