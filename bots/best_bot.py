@@ -2,7 +2,6 @@ from bots.bot import Bot
 num_nodes = 0
 class Node():
     def __init__(self, name, info, states=None, parent=None):
-        num_nodes += 1
         self.name = name
         self.info = info
         self.parents = []
@@ -11,6 +10,8 @@ class Node():
         if parent != None:
             self.add_parent(parent)
         if states != None:
+            if type(self.info) == list:
+                self.info = tuple(self.info)
             states[self.info] = self
     
     def add_parent(self, parent):
@@ -24,24 +25,30 @@ class Node():
 class BestBot(Bot):
     def __init__(self, subset):
         super().__init__(subset)
+        self.num_nodes = 0
         self.states = {}
-        self.root = Node('state', self.answers, self.states)
+        self.root = None
 
     def guess(self, game_info):
+        # If it is already calculated, return that
         state = self.get_knowledge(game_info)
         if state.guess:
             return state.guess
-        else:
-            return self.calculate_guess(state)
+        # Otherwise, calculate it
+        state = self.calculate_guess(state)
+        return state.guess
     
     def get_knowledge(self, game_info):
+        # Make a root node if it doesn't exist
+        if not self.root:
+            self.root = Node('state', self.answers, self.states); self.num_nodes += 1
+            return self.root
         temp_game_info = game_info.copy()
         while len(temp_game_info) >= 0:
             state = self.get_cur_state(temp_game_info)
-            if state in self.states:
-                return state
+            if tuple(state) in self.states:
+                return self.states[tuple(state)]
             temp_game_info.pop()
-        return None
     
     def record(self, game_info):
         # Add game_info to knowledge like how greedy_bot does it
@@ -50,11 +57,10 @@ class BestBot(Bot):
     def calculate_guess(self, root):
         # Calculate one step forward in the knowledge tree
         self.guess_nodes(root)
-        pass
 
     def guess_nodes(self, state_node):
         for guess in self.guesses:
-            guess_node = Node('guess', guess, parent=state_node)
+            guess_node = Node('guess', guess, parent=state_node); self.num_nodes += 1
             self.feedback_nodes(guess_node)
 
     def feedback_nodes(self, guess_node):
@@ -65,7 +71,7 @@ class BestBot(Bot):
         feedback_nodes = []
         for answer in self.answers:
             feedback = self.get_feedback(guess_node.info, answer)
-            feedback_node = Node('feedback', feedback, parent=guess_node)
+            feedback_node = Node('feedback', feedback, parent=guess_node); self.num_nodes += 1
             feedback_nodes.append(feedback_node)
 
         self.state_nodes(feedback_nodes)
@@ -79,11 +85,28 @@ class BestBot(Bot):
             cur_state = self.update_state(feedback_node)
             # Check if state_node is already in self.states
             found = False
-            if cur_state in self.states:
-                state = self.states[cur_state]
+            # See if the state changed since the last time
+            guess_node = feedback_node.parents[0]
+            state_node = guess_node.parents[0]
+            if state_node.info == tuple(cur_state):
+                # Don't add the state to the graph, since no information was gained
+                continue
+            if tuple(cur_state) in self.states:
+                state = self.states[tuple(cur_state)]
                 feedback_node.add_child(state)
             else:
-                Node('state', cur_state, self.states, parent=feedback_node)
+                #TODO: Make sure the state being added has more information
+                #TODO: Am I adding this to the graph? Yes, I just don't recurse here I think
+                state = Node('state', cur_state, self.states, parent=feedback_node); self.num_nodes += 1
+                # If state has only one answer, then use that as the guess
+                if len(cur_state) == 1:
+                    state.guess = cur_state[0]
+                    #TODO: Uncomment the next line
+                    # return state
+                else:
+                    #TODO: Make the next line return
+                    self.guess_nodes(state)
+
 
     def update_state(self, feedback_node):
         # Given a feedback node, update the state of the game
@@ -94,10 +117,10 @@ class BestBot(Bot):
         # Then it returns the new state
         if len(feedback_node.parents) > 1 or len(feedback_node.parents) <= 0:
             raise Exception('Feedback node has more than one parent or no parents')
-        if len(guess_node.parents) > 1 or len(guess_node.parents) <= 0:
-            raise Exception('Guess node has more than one parent or no parents')
         
         guess_node = feedback_node.parents[0]
+        if len(guess_node.parents) > 1 or len(guess_node.parents) <= 0:
+            raise Exception('Guess node has more than one parent or no parents')
         state_node = guess_node.parents[0]
 
         old_state = state_node.info
@@ -112,11 +135,11 @@ class BestBot(Bot):
         # TODO: Recurse???
         return new_state
 
-    def get_cur_state(self):
+    def get_cur_state(self, game_info):
         cur_state = []
         for answer in self.answers:
             success = True
-            for guess, feedback in self.game_info:
+            for guess, feedback in game_info:
                 #TODO: make a quick_feedback function
                 if self.get_feedback(guess, answer) != feedback:
                     success = False
