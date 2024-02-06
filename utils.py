@@ -1,3 +1,5 @@
+import os
+import psutil
 import pickle
 
 def save(object, path):
@@ -27,3 +29,12 @@ def get_feedback(guess, answer):
         if feedback[i] == "?" or feedback[i] == "C":
             feedback[i] = "B"
     return feedback
+
+def print_memory_usage():
+    # Get the current process
+    process = psutil.Process(os.getpid())
+    # Get the memory usage in bytes
+    mem_usage_bytes = process.memory_info().rss
+    # Convert bytes to gigabytes
+    mem_usage_gb = mem_usage_bytes / (1024 ** 3)
+    print(f"Current process memory usage: {mem_usage_gb:.3f} GB")

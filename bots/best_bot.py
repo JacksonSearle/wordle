@@ -36,7 +36,9 @@ class BestBot(Bot):
             return state.guess
         # Otherwise, calculate it
         state = self.calculate_guess(state)
-        return state.guess
+        #! Make this return state.guess
+        # return state.guess
+        return
     
     def get_knowledge(self, game_info):
         # Make a root node if it doesn't exist

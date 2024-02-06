@@ -1,9 +1,10 @@
 from tqdm import tqdm
-from utils import load, save, get_feedback
+from utils import load, save, get_feedback, print_memory_usage
 from bots.chump_bot import ChumpBot
 from bots.random_bot import RandomBot
 from bots.greedy_bot import GreedyBot
 from bots.best_bot import BestBot
+import time
 
 
 class Game():
@@ -106,15 +107,24 @@ class Game():
         print(f'Win percentage: {win_percentage}%')
     
     def train(self):
+        start = time.time()
         for answer in tqdm(self.answers):
             game_state = []
             for turn in range(6):
                 guess = self.take_turn(game_state)
+                #! Take away this breakpoint
+                break
                 feedback = get_feedback(guess, answer)
                 game_state.append((guess, feedback))
                 self.bot.record(game_state)
                 if guess == answer:
                     break
+        end = time.time()
+        print(f'Training took {round(end - start, 2)} seconds.')
+        # Print out how many nodes were created
+        print(f'Number of nodes created: {self.bot.num_nodes}')
+        # Print out how many gigs of memory were used
+        print_memory_usage()
     
     def inference(self):
         # Play the game
