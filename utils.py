@@ -1,6 +1,7 @@
 import os
 import psutil
 import pickle
+from functools import cache
 
 def save(object, path):
     # Pickle this object
@@ -10,6 +11,7 @@ def load(path):
     # Load the pickled object
     return pickle.load(open(path, 'rb'))
 
+@cache
 def get_feedback(guess, answer):
     feedback = []
     taken = []
