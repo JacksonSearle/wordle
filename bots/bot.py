@@ -7,6 +7,7 @@ class Bot():
         self.load_guesses()
         self.get_feedback = get_feedback
         self.knowledge = {}
+        self.num_nodes = 0
     
     def load_guesses(self):
         if self.subset:

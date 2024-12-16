@@ -4,10 +4,11 @@ from bots.chump_bot import ChumpBot
 from bots.random_bot import RandomBot
 from bots.greedy_bot import GreedyBot
 from bots.best_bot import BestBot
+from bots.hard_bot import HardBot
 import time
 
 
-class Game():
+class HardGame():
     def __init__(self,mode='inference', subset=None):
         self.subset = subset
         if mode == 'subset':
@@ -49,7 +50,7 @@ class Game():
         save(subset_guesses, f'words/guesses{self.subset}.pkl')
 
     def select_bot(self):
-        bots = [ChumpBot, RandomBot, GreedyBot, BestBot]
+        bots = [ChumpBot, RandomBot, GreedyBot, BestBot, HardBot]
 
         # Print out each class name
         print('Select a bot:')

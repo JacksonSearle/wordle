@@ -1,6 +1,6 @@
 import sys
 from utils import *
-from game import Game
+from game import HardGame
 
 
 def main():
@@ -10,7 +10,7 @@ def main():
     if mode not in ['train', 'test', 'inference', 'subset']:
         print("Usage: python main.py [train|test|inference|subset] [subset]")
         return
-    Game(mode=mode, subset=subset)
+    HardGame(mode=mode, subset=subset)
 
 if __name__ == '__main__':
     main()
