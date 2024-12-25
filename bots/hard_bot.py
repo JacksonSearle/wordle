@@ -1,13 +1,20 @@
 from bots.bot import Bot
 num_nodes = 0
 class Node():
-    def __init__(self, name, info, states=None, parent=None, turn=None):
+    def __init__(self, name, info, states=None, parent=None, turn=None, past_guesses=[], guesses=None):
         self.name = name
         self.info = info
         self.parents = []
         self.children = []
         self.guess = None
         self.turn = turn
+        self.guesses = guesses
+        
+        if name == 'guess':
+            if past_guesses == []:
+                self.past_guesses = [info]
+            else:
+                self.past_guesses = past_guesses.append(info)
 
         if states != None:
             if type(self.info) == list:
@@ -56,7 +63,7 @@ class HardBot(Bot):
         # Make a root node if it doesn't exist
         if not self.root:
             try:
-                self.root = Node('state', self.answers, self.states, turn=0); self.num_nodes += 1
+                self.root = Node('state', self.answers, self.states, turn=0, guesses=self.guesses); self.num_nodes += 1
                 return self.root
             except:
                 print('Error failed to make root node')
@@ -76,8 +83,8 @@ class HardBot(Bot):
         self.guess_nodes(root)
 
     def guess_nodes(self, state_node):
-        for guess in self.guesses:
-            guess_node = Node('guess', guess, parent=state_node); self.num_nodes += 1
+        for guess in state_node.guesses:
+            guess_node = Node('guess', info=guess, parent=state_node); self.num_nodes += 1
             self.feedback_nodes(guess_node)
 
     def feedback_nodes(self, guess_node):
@@ -88,10 +95,34 @@ class HardBot(Bot):
         feedback_nodes = []
         for answer in self.answers:
             feedback = self.get_feedback(guess_node.info, answer)
-            feedback_node = Node('feedback', feedback, parent=guess_node); self.num_nodes += 1
+            feedback_node = Node('feedback', info=feedback, parent=guess_node); self.num_nodes += 1
             feedback_nodes.append(feedback_node)
 
         self.state_nodes(feedback_nodes)
+
+    def update_guess_state(self, feedback_node, answer_state):
+        old_guesses = feedback_node.parents[0].parents[0].guesses
+        feedback = feedback_node.info
+        guess = feedback_node.parents[0].info
+
+        guesses = []
+        for guess_to_filter in old_guesses:
+            if self.hardmode_criteria(guess, feedback, guess_to_filter):
+                guesses.append(guess_to_filter)
+        return guesses
+    
+    def hardmode_criteria(self, guess, feedback, guess_to_filter):
+        for i, letter in enumerate(feedback):
+            # Ensure green is reflected in guess_to_filter
+            if letter == 'G':
+                if guess[i] != guess_to_filter[i]:
+                    return False
+            # Ensure yellow is reflected in guess_to_filter  
+            if letter == 'Y':    
+                if guess[i] not in guess_to_filter:
+                    return False
+        return True
+
 
     def state_nodes(self, feedback_nodes):
         # These nodes represent the state of the game after a guess and feedback
@@ -99,25 +130,26 @@ class HardBot(Bot):
         # There are not duplicates of state_nodes, unique ones are shared between feedback nodes
         # Add all states to self.states
         for feedback_node in feedback_nodes:
-            cur_state = self.update_state(feedback_node)
+            answer_state = self.update_answer_state(feedback_node)
+            guesses = self.update_guess_state(feedback_node, answer_state)
             # Check if state_node is already in self.states
             found = False
             # See if the state changed since the last time
             guess_node = feedback_node.parents[0]
             state_node = guess_node.parents[0]
-            if state_node.info == cur_state:
+            if state_node.info == answer_state:
                 # Don't add the state to the graph, since no information was gained
                 continue
-            if cur_state in self.states:
-                state = self.states[cur_state]
+            if answer_state in self.states:
+                state = self.states[answer_state]
                 feedback_node.add_child(state)
             else:
                 #TODO: Am I adding this to the graph? Yes, I just don't recurse here I think
                 try:
-                    state = Node('state', cur_state, self.states, parent=feedback_node); self.num_nodes += 1
+                    state = Node('state', answer_state, self.states, parent=feedback_node, guesses=guesses); self.num_nodes += 1
                     # If state has only one answer, then use that as the guess
-                    if len(cur_state) == 1:
-                        state.guess = cur_state[0]
+                    if len(answer_state) == 1:
+                        state.guess = answer_state[0]
                         #TODO: Uncomment the next line
                         # return state
                     else:
@@ -127,7 +159,7 @@ class HardBot(Bot):
                     continue
 
 
-    def update_state(self, feedback_node):
+    def update_answer_state(self, feedback_node):
         # Given a feedback node, update the state of the game
         # This goes up through the feedback_node's parents
         # So it goes to the guess_node then the state_node
